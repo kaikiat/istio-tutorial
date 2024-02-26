@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: http-https-echo
+  annotations:
+    sidecar.istio.io/inject: "true"
+spec:
+  selector:
+    matchLabels:
+      app: http-https-echo
+  template:
+    metadata:
+      labels:
+        app: http-https-echo
+    spec:
+      containers:
+        - name: http-https-echo
+          # image: docker.io/kennethreitz/httpbin
+          image: mendhak/http-https-echo
+          ports:
+            - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: http-https-echo-service
+spec:
+  selector:
+    app: http-https-echo
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: gateway
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+    - port:
+        number: 80
+        name: http
+        protocol: HTTP
+      hosts:
+        - "*"
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: http-https-echo
+spec:
+  hosts:
+    - "*"
+  gateways:
+    - gateway
+  http:
+    - match:
+        - uri:
+            prefix: "/myecho"
+      route:
+        - destination:
+            host: http-https-echo-service.test.svc.cluster.local
+            port:
+              number: 8080
+      headers:
+        response:
+          add:
+            hello: world
+          remove:
+          - test

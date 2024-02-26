@@ -1,0 +1,3881 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.11.3
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/component: telemetry
+    app.kubernetes.io/instance: telemetry-operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: telemetry-operator
+    app.kubernetes.io/part-of: kyma
+    control-plane: telemetry-operator
+  name: logparsers.telemetry.kyma-project.io
+spec:
+  group: telemetry.kyma-project.io
+  names:
+    kind: LogParser
+    listKind: LogParserList
+    plural: logparsers
+    singular: logparser
+  scope: Cluster
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.conditions[-1].type
+      name: Status
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    deprecated: true
+    deprecationWarning: The LogParser API is deprecated. Instead, log in JSON format
+      and use the JSON parsing feature of the LogPipeline
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: LogParser is the Schema for the logparsers API.
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: Defines the desired state of LogParser.
+            properties:
+              parser:
+                description: '[Fluent Bit Parsers](https://docs.fluentbit.io/manual/pipeline/parsers).
+                  The parser specified here has no effect until it is referenced by
+                  a [Pod annotation](https://docs.fluentbit.io/manual/pipeline/filters/kubernetes#kubernetes-annotations)
+                  on your workload or by a [Parser Filter](https://docs.fluentbit.io/manual/pipeline/filters/parser)
+                  defined in a pipeline''s filters section.'
+                type: string
+            type: object
+          status:
+            description: Shows the observed state of the LogParser.
+            properties:
+              conditions:
+                description: An array of conditions describing the status of the parser.
+                items:
+                  properties:
+                    lastTransitionTime:
+                      description: An array of conditions describing the status of
+                        the parser.
+                      format: date-time
+                      type: string
+                    reason:
+                      description: An array of conditions describing the status of
+                        the parser.
+                      type: string
+                    type:
+                      description: 'The possible transition types are:<br>- `Running`:
+                        The parser is ready and usable.<br>- `Pending`: The parser
+                        is being activated.'
+                      type: string
+                  type: object
+                type: array
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.11.3
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/component: telemetry
+    app.kubernetes.io/instance: telemetry-operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: telemetry-operator
+    app.kubernetes.io/part-of: kyma
+    control-plane: telemetry-operator
+  name: logpipelines.telemetry.kyma-project.io
+spec:
+  group: telemetry.kyma-project.io
+  names:
+    kind: LogPipeline
+    listKind: LogPipelineList
+    plural: logpipelines
+    singular: logpipeline
+  scope: Cluster
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.conditions[-1].type
+      name: Status
+      type: string
+    - jsonPath: .status.unsupportedMode
+      name: Unsupported-Mode
+      type: boolean
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: LogPipeline is the Schema for the logpipelines API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: Defines the desired state of LogPipeline
+            properties:
+              files:
+                items:
+                  description: Provides file content to be consumed by a LogPipeline
+                    configuration
+                  properties:
+                    content:
+                      type: string
+                    name:
+                      type: string
+                  type: object
+                type: array
+              filters:
+                items:
+                  description: Describes a filtering option on the logs of the pipeline.
+                  properties:
+                    custom:
+                      description: 'Custom filter definition in the Fluent Bit syntax.
+                        Note: If you use a `custom` filter, you put the LogPipeline
+                        in unsupported mode.'
+                      type: string
+                  type: object
+                type: array
+              input:
+                description: Defines where to collect logs, including selector mechanisms.
+                properties:
+                  application:
+                    description: Configures in more detail from which containers application
+                      logs are enabled as input.
+                    properties:
+                      containers:
+                        description: Describes whether application logs from specific
+                          containers are selected. The options are mutually exclusive.
+                        properties:
+                          exclude:
+                            description: Specifies to exclude only the container logs
+                              with the specified container names.
+                            items:
+                              type: string
+                            type: array
+                          include:
+                            description: Specifies to include only the container logs
+                              with the specified container names.
+                            items:
+                              type: string
+                            type: array
+                        type: object
+                      dropLabels:
+                        description: Defines whether to drop all Kubernetes labels.
+                          The default is `false`.
+                        type: boolean
+                      keepAnnotations:
+                        description: Defines whether to keep all Kubernetes annotations.
+                          The default is `false`.
+                        type: boolean
+                      namespaces:
+                        description: Describes whether application logs from specific
+                          Namespaces are selected. The options are mutually exclusive.
+                          System Namespaces are excluded by default from the collection.
+                        properties:
+                          exclude:
+                            description: Exclude the container logs of the specified
+                              Namespace names.
+                            items:
+                              type: string
+                            type: array
+                          include:
+                            description: Include only the container logs of the specified
+                              Namespace names.
+                            items:
+                              type: string
+                            type: array
+                          system:
+                            description: Set to `true` if collecting from all Namespaces
+                              must also include the system Namespaces like kube-system,
+                              istio-system, and kyma-system.
+                            type: boolean
+                        type: object
+                    type: object
+                type: object
+              output:
+                description: '[Fluent Bit output](https://docs.fluentbit.io/manual/pipeline/outputs)
+                  where you want to push the logs. Only one output can be specified.'
+                properties:
+                  custom:
+                    description: 'Defines a custom output in the Fluent Bit syntax.
+                      Note: If you use a `custom` output, you put the LogPipeline
+                      in unsupported mode.'
+                    type: string
+                  grafana-loki:
+                    description: The grafana-loki output is not supported anymore.
+                      For integration with a custom Loki installation, use the `custom`
+                      output and follow [Installing a custom Loki stack in Kyma](https://github.com/kyma-project/examples/tree/main/loki).
+                    properties:
+                      labels:
+                        additionalProperties:
+                          type: string
+                        description: Labels to set for each log record.
+                        type: object
+                      removeKeys:
+                        description: Attributes to be removed from a log record.
+                        items:
+                          type: string
+                        type: array
+                      url:
+                        description: Grafana Loki URL.
+                        properties:
+                          value:
+                            description: The value as plain text.
+                            type: string
+                          valueFrom:
+                            description: The value as a reference to a resource.
+                            properties:
+                              secretKeyRef:
+                                description: Refers to the value of a specific key
+                                  in a Secret. You must provide `name` and `namespace`
+                                  of the Secret, as well as the name of the `key`.
+                                properties:
+                                  key:
+                                    description: The name of the attribute of the
+                                      Secret holding the referenced value.
+                                    type: string
+                                  name:
+                                    description: The name of the Secret containing
+                                      the referenced value
+                                    type: string
+                                  namespace:
+                                    description: The name of the Namespace containing
+                                      the Secret with the referenced value.
+                                    type: string
+                                type: object
+                            type: object
+                        type: object
+                    type: object
+                  http:
+                    description: Configures an HTTP-based output compatible with the
+                      Fluent Bit HTTP output plugin.
+                    properties:
+                      compress:
+                        description: Defines the compression algorithm to use.
+                        type: string
+                      dedot:
+                        description: Enables de-dotting of Kubernetes labels and annotations
+                          for compatibility with ElasticSearch based backends. Dots
+                          (.) will be replaced by underscores (_). Default is `false`.
+                        type: boolean
+                      format:
+                        description: Data format to be used in the HTTP request body.
+                          Default is `json`.
+                        type: string
+                      host:
+                        description: Defines the host of the HTTP receiver.
+                        properties:
+                          value:
+                            description: The value as plain text.
+                            type: string
+                          valueFrom:
+                            description: The value as a reference to a resource.
+                            properties:
+                              secretKeyRef:
+                                description: Refers to the value of a specific key
+                                  in a Secret. You must provide `name` and `namespace`
+                                  of the Secret, as well as the name of the `key`.
+                                properties:
+                                  key:
+                                    description: The name of the attribute of the
+                                      Secret holding the referenced value.
+                                    type: string
+                                  name:
+                                    description: The name of the Secret containing
+                                      the referenced value
+                                    type: string
+                                  namespace:
+                                    description: The name of the Namespace containing
+                                      the Secret with the referenced value.
+                                    type: string
+                                type: object
+                            type: object
+                        type: object
+                      password:
+                        description: Defines the basic auth password.
+                        properties:
+                          value:
+                            description: The value as plain text.
+                            type: string
+                          valueFrom:
+                            description: The value as a reference to a resource.
+                            properties:
+                              secretKeyRef:
+                                description: Refers to the value of a specific key
+                                  in a Secret. You must provide `name` and `namespace`
+                                  of the Secret, as well as the name of the `key`.
+                                properties:
+                                  key:
+                                    description: The name of the attribute of the
+                                      Secret holding the referenced value.
+                                    type: string
+                                  name:
+                                    description: The name of the Secret containing
+                                      the referenced value
+                                    type: string
+                                  namespace:
+                                    description: The name of the Namespace containing
+                                      the Secret with the referenced value.
+                                    type: string
+                                type: object
+                            type: object
+                        type: object
+                      port:
+                        description: Defines the port of the HTTP receiver. Default
+                          is 443.
+                        type: string
+                      tls:
+                        description: Configures TLS for the HTTP target server.
+                        properties:
+                          ca:
+                            description: Defines an optional CA certificate for server
+                              certificate verification when using TLS. The certificate
+                              must be provided in PEM format.
+                            properties:
+                              value:
+                                description: The value as plain text.
+                                type: string
+                              valueFrom:
+                                description: The value as a reference to a resource.
+                                properties:
+                                  secretKeyRef:
+                                    description: Refers to the value of a specific
+                                      key in a Secret. You must provide `name` and
+                                      `namespace` of the Secret, as well as the name
+                                      of the `key`.
+                                    properties:
+                                      key:
+                                        description: The name of the attribute of
+                                          the Secret holding the referenced value.
+                                        type: string
+                                      name:
+                                        description: The name of the Secret containing
+                                          the referenced value
+                                        type: string
+                                      namespace:
+                                        description: The name of the Namespace containing
+                                          the Secret with the referenced value.
+                                        type: string
+                                    type: object
+                                type: object
+                            type: object
+                          cert:
+                            description: Defines a client certificate to use when
+                              using TLS. The certificate must be provided in PEM format.
+                            properties:
+                              value:
+                                description: The value as plain text.
+                                type: string
+                              valueFrom:
+                                description: The value as a reference to a resource.
+                                properties:
+                                  secretKeyRef:
+                                    description: Refers to the value of a specific
+                                      key in a Secret. You must provide `name` and
+                                      `namespace` of the Secret, as well as the name
+                                      of the `key`.
+                                    properties:
+                                      key:
+                                        description: The name of the attribute of
+                                          the Secret holding the referenced value.
+                                        type: string
+                                      name:
+                                        description: The name of the Secret containing
+                                          the referenced value
+                                        type: string
+                                      namespace:
+                                        description: The name of the Namespace containing
+                                          the Secret with the referenced value.
+                                        type: string
+                                    type: object
+                                type: object
+                            type: object
+                          disabled:
+                            description: Indicates if TLS is disabled or enabled.
+                              Default is `false`.
+                            type: boolean
+                          key:
+                            description: Defines the client key to use when using
+                              TLS. The key must be provided in PEM format.
+                            properties:
+                              value:
+                                description: The value as plain text.
+                                type: string
+                              valueFrom:
+                                description: The value as a reference to a resource.
+                                properties:
+                                  secretKeyRef:
+                                    description: Refers to the value of a specific
+                                      key in a Secret. You must provide `name` and
+                                      `namespace` of the Secret, as well as the name
+                                      of the `key`.
+                                    properties:
+                                      key:
+                                        description: The name of the attribute of
+                                          the Secret holding the referenced value.
+                                        type: string
+                                      name:
+                                        description: The name of the Secret containing
+                                          the referenced value
+                                        type: string
+                                      namespace:
+                                        description: The name of the Namespace containing
+                                          the Secret with the referenced value.
+                                        type: string
+                                    type: object
+                                type: object
+                            type: object
+                          skipCertificateValidation:
+                            description: If `true`, the validation of certificates
+                              is skipped. Default is `false`.
+                            type: boolean
+                        type: object
+                      uri:
+                        description: Defines the URI of the HTTP receiver. Default
+                          is "/".
+                        type: string
+                      user:
+                        description: Defines the basic auth user.
+                        properties:
+                          value:
+                            description: The value as plain text.
+                            type: string
+                          valueFrom:
+                            description: The value as a reference to a resource.
+                            properties:
+                              secretKeyRef:
+                                description: Refers to the value of a specific key
+                                  in a Secret. You must provide `name` and `namespace`
+                                  of the Secret, as well as the name of the `key`.
+                                properties:
+                                  key:
+                                    description: The name of the attribute of the
+                                      Secret holding the referenced value.
+                                    type: string
+                                  name:
+                                    description: The name of the Secret containing
+                                      the referenced value
+                                    type: string
+                                  namespace:
+                                    description: The name of the Namespace containing
+                                      the Secret with the referenced value.
+                                    type: string
+                                type: object
+                            type: object
+                        type: object
+                    type: object
+                type: object
+              variables:
+                description: A list of mappings from Kubernetes Secret keys to environment
+                  variables. Mapped keys are mounted as environment variables, so
+                  that they are available as [Variables](https://docs.fluentbit.io/manual/administration/configuring-fluent-bit/classic-mode/variables)
+                  in the sections.
+                items:
+                  description: References a Kubernetes secret that should be provided
+                    as environment variable to Fluent Bit
+                  properties:
+                    name:
+                      description: Name of the variable to map.
+                      type: string
+                    valueFrom:
+                      properties:
+                        secretKeyRef:
+                          description: Refers to the value of a specific key in a
+                            Secret. You must provide `name` and `namespace` of the
+                            Secret, as well as the name of the `key`.
+                          properties:
+                            key:
+                              description: The name of the attribute of the Secret
+                                holding the referenced value.
+                              type: string
+                            name:
+                              description: The name of the Secret containing the referenced
+                                value
+                              type: string
+                            namespace:
+                              description: The name of the Namespace containing the
+                                Secret with the referenced value.
+                              type: string
+                          type: object
+                      type: object
+                  type: object
+                type: array
+            type: object
+          status:
+            description: Shows the observed state of the LogPipeline
+            properties:
+              conditions:
+                description: An array of conditions describing the status of the pipeline.
+                items:
+                  description: LogPipelineCondition contains details for the current
+                    condition of this LogPipeline.
+                  properties:
+                    lastTransitionTime:
+                      description: An array of conditions describing the status of
+                        the pipeline.
+                      format: date-time
+                      type: string
+                    reason:
+                      description: Reason of last transition.
+                      type: string
+                    type:
+                      description: 'The possible transition types are:<br>- `Running`:
+                        The instance is ready and usable.<br>- `Pending`: The pipeline
+                        is being activated.'
+                      type: string
+                  type: object
+                type: array
+              unsupportedMode:
+                description: Is active when the LogPipeline uses a `custom` output
+                  or filter; see [unsupported mode](https://github.com/kyma-project/telemetry-manager/blob/main/docs/user/02-logs.md#unsupported-mode).
+                type: boolean
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.11.3
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/component: telemetry
+    app.kubernetes.io/instance: telemetry-operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: telemetry-operator
+    app.kubernetes.io/part-of: kyma
+    control-plane: telemetry-operator
+  name: metricpipelines.telemetry.kyma-project.io
+spec:
+  group: telemetry.kyma-project.io
+  names:
+    kind: MetricPipeline
+    listKind: MetricPipelineList
+    plural: metricpipelines
+    singular: metricpipeline
+  scope: Cluster
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.conditions[?(@.type=="ConfigurationGenerated")].status
+      name: Configuration Generated
+      type: string
+    - jsonPath: .status.conditions[?(@.type=="GatewayHealthy")].status
+      name: Gateway Healthy
+      type: string
+    - jsonPath: .status.conditions[?(@.type=="AgentHealthy")].status
+      name: Agent Healthy
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: MetricPipeline is the Schema for the metricpipelines API.
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: Defines the desired characteristics of MetricPipeline.
+            properties:
+              input:
+                description: Configures different inputs to send additional metrics
+                  to the metric gateway.
+                properties:
+                  istio:
+                    description: Configures istio-proxy metrics scraping.
+                    properties:
+                      enabled:
+                        description: If enabled, metrics for istio-proxy containers
+                          are scraped from Pods that have had the istio-proxy sidecar
+                          injected. The default is `false`.
+                        type: boolean
+                      namespaces:
+                        description: Describes whether istio-proxy metrics from specific
+                          Namespaces are selected. System Namespaces are enabled by
+                          default.
+                        properties:
+                          exclude:
+                            description: Exclude metrics from the specified Namespace
+                              names only.
+                            items:
+                              type: string
+                            type: array
+                          include:
+                            description: Include metrics from the specified Namespace
+                              names only.
+                            items:
+                              type: string
+                            type: array
+                        type: object
+                        x-kubernetes-validations:
+                        - message: Can only define one namespace selector - either
+                            'include' or 'exclude'
+                          rule: '!((has(self.include) && size(self.include) != 0)
+                            && (has(self.exclude) && size(self.exclude) != 0))'
+                    type: object
+                  otlp:
+                    description: Configures the collection of push-based metrics that
+                      use the OpenTelemetry protocol.
+                    properties:
+                      disabled:
+                        description: If disabled, push-based OTLP metrics are not
+                          collected. The default is `false`.
+                        type: boolean
+                      namespaces:
+                        description: Describes whether push-based OTLP metrics from
+                          specific Namespaces are selected. System Namespaces are
+                          enabled by default.
+                        properties:
+                          exclude:
+                            description: Exclude metrics from the specified Namespace
+                              names only.
+                            items:
+                              type: string
+                            type: array
+                          include:
+                            description: Include metrics from the specified Namespace
+                              names only.
+                            items:
+                              type: string
+                            type: array
+                        type: object
+                        x-kubernetes-validations:
+                        - message: Can only define one namespace selector - either
+                            'include' or 'exclude'
+                          rule: '!((has(self.include) && size(self.include) != 0)
+                            && (has(self.exclude) && size(self.exclude) != 0))'
+                    type: object
+                  prometheus:
+                    description: Configures Prometheus scraping.
+                    properties:
+                      enabled:
+                        description: If enabled, Pods marked with `prometheus.io/scrape=true`
+                          annotation are scraped. The default is `false`.
+                        type: boolean
+                      namespaces:
+                        default:
+                          exclude:
+                          - kyma-system
+                          - kube-system
+                          - istio-system
+                          - compass-system
+                        description: Describes whether Prometheus metrics from specific
+                          Namespaces are selected. System Namespaces are disabled
+                          by default.
+                        properties:
+                          exclude:
+                            description: Exclude metrics from the specified Namespace
+                              names only.
+                            items:
+                              type: string
+                            type: array
+                          include:
+                            description: Include metrics from the specified Namespace
+                              names only.
+                            items:
+                              type: string
+                            type: array
+                        type: object
+                        x-kubernetes-validations:
+                        - message: Can only define one namespace selector - either
+                            'include' or 'exclude'
+                          rule: '!((has(self.include) && size(self.include) != 0)
+                            && (has(self.exclude) && size(self.exclude) != 0))'
+                    type: object
+                  runtime:
+                    description: Configures runtime scraping.
+                    properties:
+                      enabled:
+                        description: If enabled, workload-related Kubernetes metrics
+                          are scraped. The default is `false`.
+                        type: boolean
+                      namespaces:
+                        default:
+                          exclude:
+                          - kyma-system
+                          - kube-system
+                          - istio-system
+                          - compass-system
+                        description: Describes whether workload-related Kubernetes
+                          metrics from specific Namespaces are selected. System Namespaces
+                          are disabled by default.
+                        properties:
+                          exclude:
+                            description: Exclude metrics from the specified Namespace
+                              names only.
+                            items:
+                              type: string
+                            type: array
+                          include:
+                            description: Include metrics from the specified Namespace
+                              names only.
+                            items:
+                              type: string
+                            type: array
+                        type: object
+                        x-kubernetes-validations:
+                        - message: Can only define one namespace selector - either
+                            'include' or 'exclude'
+                          rule: '!((has(self.include) && size(self.include) != 0)
+                            && (has(self.exclude) && size(self.exclude) != 0))'
+                    type: object
+                type: object
+              output:
+                description: Configures the metric gateway.
+                properties:
+                  otlp:
+                    description: Defines an output using the OpenTelemetry protocol.
+                    properties:
+                      authentication:
+                        description: Defines authentication options for the OTLP output
+                        properties:
+                          basic:
+                            description: Activates `Basic` authentication for the
+                              destination providing relevant Secrets.
+                            properties:
+                              password:
+                                description: Contains the basic auth password or a
+                                  Secret reference.
+                                properties:
+                                  value:
+                                    description: The value as plain text.
+                                    type: string
+                                  valueFrom:
+                                    description: The value as a reference to a resource.
+                                    properties:
+                                      secretKeyRef:
+                                        description: Refers to the value of a specific
+                                          key in a Secret. You must provide `name`
+                                          and `namespace` of the Secret, as well as
+                                          the name of the `key`.
+                                        properties:
+                                          key:
+                                            description: The name of the attribute
+                                              of the Secret holding the referenced
+                                              value.
+                                            type: string
+                                          name:
+                                            description: The name of the Secret containing
+                                              the referenced value
+                                            type: string
+                                          namespace:
+                                            description: The name of the Namespace
+                                              containing the Secret with the referenced
+                                              value.
+                                            type: string
+                                        type: object
+                                    type: object
+                                type: object
+                              user:
+                                description: Contains the basic auth username or a
+                                  Secret reference.
+                                properties:
+                                  value:
+                                    description: The value as plain text.
+                                    type: string
+                                  valueFrom:
+                                    description: The value as a reference to a resource.
+                                    properties:
+                                      secretKeyRef:
+                                        description: Refers to the value of a specific
+                                          key in a Secret. You must provide `name`
+                                          and `namespace` of the Secret, as well as
+                                          the name of the `key`.
+                                        properties:
+                                          key:
+                                            description: The name of the attribute
+                                              of the Secret holding the referenced
+                                              value.
+                                            type: string
+                                          name:
+                                            description: The name of the Secret containing
+                                              the referenced value
+                                            type: string
+                                          namespace:
+                                            description: The name of the Namespace
+                                              containing the Secret with the referenced
+                                              value.
+                                            type: string
+                                        type: object
+                                    type: object
+                                type: object
+                            required:
+                            - password
+                            - user
+                            type: object
+                        type: object
+                      endpoint:
+                        description: Defines the host and port (<host>:<port>) of
+                          an OTLP endpoint.
+                        properties:
+                          value:
+                            description: The value as plain text.
+                            type: string
+                          valueFrom:
+                            description: The value as a reference to a resource.
+                            properties:
+                              secretKeyRef:
+                                description: Refers to the value of a specific key
+                                  in a Secret. You must provide `name` and `namespace`
+                                  of the Secret, as well as the name of the `key`.
+                                properties:
+                                  key:
+                                    description: The name of the attribute of the
+                                      Secret holding the referenced value.
+                                    type: string
+                                  name:
+                                    description: The name of the Secret containing
+                                      the referenced value
+                                    type: string
+                                  namespace:
+                                    description: The name of the Namespace containing
+                                      the Secret with the referenced value.
+                                    type: string
+                                type: object
+                            type: object
+                        type: object
+                      headers:
+                        description: Defines custom headers to be added to outgoing
+                          HTTP or GRPC requests.
+                        items:
+                          properties:
+                            name:
+                              description: Defines the header name.
+                              type: string
+                            value:
+                              description: The value as plain text.
+                              type: string
+                            valueFrom:
+                              description: The value as a reference to a resource.
+                              properties:
+                                secretKeyRef:
+                                  description: Refers to the value of a specific key
+                                    in a Secret. You must provide `name` and `namespace`
+                                    of the Secret, as well as the name of the `key`.
+                                  properties:
+                                    key:
+                                      description: The name of the attribute of the
+                                        Secret holding the referenced value.
+                                      type: string
+                                    name:
+                                      description: The name of the Secret containing
+                                        the referenced value
+                                      type: string
+                                    namespace:
+                                      description: The name of the Namespace containing
+                                        the Secret with the referenced value.
+                                      type: string
+                                  type: object
+                              type: object
+                          required:
+                          - name
+                          type: object
+                        type: array
+                      protocol:
+                        default: grpc
+                        description: Defines the OTLP protocol (http or grpc). Default
+                          is GRPC.
+                        enum:
+                        - grpc
+                        - http
+                        minLength: 1
+                        type: string
+                      tls:
+                        description: Defines TLS options for the OTLP output.
+                        properties:
+                          ca:
+                            description: Defines an optional CA certificate for server
+                              certificate verification when using TLS. The certificate
+                              must be provided in PEM format.
+                            properties:
+                              value:
+                                description: The value as plain text.
+                                type: string
+                              valueFrom:
+                                description: The value as a reference to a resource.
+                                properties:
+                                  secretKeyRef:
+                                    description: Refers to the value of a specific
+                                      key in a Secret. You must provide `name` and
+                                      `namespace` of the Secret, as well as the name
+                                      of the `key`.
+                                    properties:
+                                      key:
+                                        description: The name of the attribute of
+                                          the Secret holding the referenced value.
+                                        type: string
+                                      name:
+                                        description: The name of the Secret containing
+                                          the referenced value
+                                        type: string
+                                      namespace:
+                                        description: The name of the Namespace containing
+                                          the Secret with the referenced value.
+                                        type: string
+                                    type: object
+                                type: object
+                            type: object
+                          cert:
+                            description: Defines a client certificate to use when
+                              using TLS. The certificate must be provided in PEM format.
+                            properties:
+                              value:
+                                description: The value as plain text.
+                                type: string
+                              valueFrom:
+                                description: The value as a reference to a resource.
+                                properties:
+                                  secretKeyRef:
+                                    description: Refers to the value of a specific
+                                      key in a Secret. You must provide `name` and
+                                      `namespace` of the Secret, as well as the name
+                                      of the `key`.
+                                    properties:
+                                      key:
+                                        description: The name of the attribute of
+                                          the Secret holding the referenced value.
+                                        type: string
+                                      name:
+                                        description: The name of the Secret containing
+                                          the referenced value
+                                        type: string
+                                      namespace:
+                                        description: The name of the Namespace containing
+                                          the Secret with the referenced value.
+                                        type: string
+                                    type: object
+                                type: object
+                            type: object
+                          insecure:
+                            description: Defines whether to send requests using plaintext
+                              instead of TLS.
+                            type: boolean
+                          insecureSkipVerify:
+                            description: Defines whether to skip server certificate
+                              verification when using TLS.
+                            type: boolean
+                          key:
+                            description: Defines the client key to use when using
+                              TLS. The key must be provided in PEM format.
+                            properties:
+                              value:
+                                description: The value as plain text.
+                                type: string
+                              valueFrom:
+                                description: The value as a reference to a resource.
+                                properties:
+                                  secretKeyRef:
+                                    description: Refers to the value of a specific
+                                      key in a Secret. You must provide `name` and
+                                      `namespace` of the Secret, as well as the name
+                                      of the `key`.
+                                    properties:
+                                      key:
+                                        description: The name of the attribute of
+                                          the Secret holding the referenced value.
+                                        type: string
+                                      name:
+                                        description: The name of the Secret containing
+                                          the referenced value
+                                        type: string
+                                      namespace:
+                                        description: The name of the Namespace containing
+                                          the Secret with the referenced value.
+                                        type: string
+                                    type: object
+                                type: object
+                            type: object
+                        type: object
+                    required:
+                    - endpoint
+                    type: object
+                required:
+                - otlp
+                type: object
+            type: object
+          status:
+            description: Represents the current information/status of MetricPipeline.
+            properties:
+              conditions:
+                description: An array of conditions describing the status of the pipeline.
+                items:
+                  description: "Condition contains details for one aspect of the current
+                    state of this API Resource. --- This struct is intended for direct
+                    use as an array at the field path .status.conditions.  For example,
+                    \n type FooStatus struct{ // Represents the observations of a
+                    foo's current state. // Known .status.conditions.type are: \"Available\",
+                    \"Progressing\", and \"Degraded\" // +patchMergeKey=type // +patchStrategy=merge
+                    // +listType=map // +listMapKey=type Conditions []metav1.Condition
+                    `json:\"conditions,omitempty\" patchStrategy:\"merge\" patchMergeKey:\"type\"
+                    protobuf:\"bytes,1,rep,name=conditions\"` \n // other fields }"
+                  properties:
+                    lastTransitionTime:
+                      description: lastTransitionTime is the last time the condition
+                        transitioned from one status to another. This should be when
+                        the underlying condition changed.  If that is not known, then
+                        using the time when the API field changed is acceptable.
+                      format: date-time
+                      type: string
+                    message:
+                      description: message is a human readable message indicating
+                        details about the transition. This may be an empty string.
+                      maxLength: 32768
+                      type: string
+                    observedGeneration:
+                      description: observedGeneration represents the .metadata.generation
+                        that the condition was set based upon. For instance, if .metadata.generation
+                        is currently 12, but the .status.conditions[x].observedGeneration
+                        is 9, the condition is out of date with respect to the current
+                        state of the instance.
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    reason:
+                      description: reason contains a programmatic identifier indicating
+                        the reason for the condition's last transition. Producers
+                        of specific condition types may define expected values and
+                        meanings for this field, and whether the values are considered
+                        a guaranteed API. The value should be a CamelCase string.
+                        This field may not be empty.
+                      maxLength: 1024
+                      minLength: 1
+                      pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                      type: string
+                    status:
+                      description: status of the condition, one of True, False, Unknown.
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                      type: string
+                    type:
+                      description: type of condition in CamelCase or in foo.example.com/CamelCase.
+                        --- Many .condition.type values are consistent across resources
+                        like Available, but because arbitrary conditions can be useful
+                        (see .node.status.conditions), the ability to deconflict is
+                        important. The regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)
+                      maxLength: 316
+                      pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - message
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.11.3
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/component: telemetry
+    app.kubernetes.io/instance: telemetry-operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: telemetry-operator
+    app.kubernetes.io/part-of: kyma
+    control-plane: telemetry-operator
+  name: telemetries.operator.kyma-project.io
+spec:
+  group: operator.kyma-project.io
+  names:
+    kind: Telemetry
+    listKind: TelemetryList
+    plural: telemetries
+    singular: telemetry
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .metadata.generation
+      name: generation
+      type: integer
+    - jsonPath: .metadata.creationTimestamp
+      name: age
+      type: date
+    - jsonPath: .status.state
+      name: state
+      type: string
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: Telemetry is the Schema for the telemetries API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: TelemetrySpec defines the desired state of Telemetry
+            properties:
+              metric:
+                description: MetricSpec defines the behavior of the metric gateway
+                properties:
+                  gateway:
+                    properties:
+                      scaling:
+                        description: Scaling defines which strategy is used for scaling
+                          the gateway, with detailed configuration options for each
+                          strategy type.
+                        properties:
+                          static:
+                            description: Static is a scaling strategy allowing you
+                              to define a custom amount of replicas to be used for
+                              the gateway. Present only if Type = StaticScalingStrategyType.
+                            properties:
+                              replicas:
+                                description: Replicas defines a static number of pods
+                                  to run the gateway. Minimum is 1.
+                                format: int32
+                                minimum: 1
+                                type: integer
+                            type: object
+                          type:
+                            description: Type of scaling strategy. Default is none,
+                              using a fixed amount of replicas.
+                            enum:
+                            - Static
+                            type: string
+                        type: object
+                    type: object
+                type: object
+              trace:
+                description: TraceSpec defines the behavior of the trace gateway
+                properties:
+                  gateway:
+                    properties:
+                      scaling:
+                        description: Scaling defines which strategy is used for scaling
+                          the gateway, with detailed configuration options for each
+                          strategy type.
+                        properties:
+                          static:
+                            description: Static is a scaling strategy allowing you
+                              to define a custom amount of replicas to be used for
+                              the gateway. Present only if Type = StaticScalingStrategyType.
+                            properties:
+                              replicas:
+                                description: Replicas defines a static number of pods
+                                  to run the gateway. Minimum is 1.
+                                format: int32
+                                minimum: 1
+                                type: integer
+                            type: object
+                          type:
+                            description: Type of scaling strategy. Default is none,
+                              using a fixed amount of replicas.
+                            enum:
+                            - Static
+                            type: string
+                        type: object
+                    type: object
+                type: object
+            type: object
+          status:
+            description: TelemetryStatus defines the observed state of Telemetry
+            properties:
+              conditions:
+                description: Conditions contain a set of conditionals to determine
+                  the State of Status. If all Conditions are met, State is expected
+                  to be in StateReady.
+                items:
+                  description: "Condition contains details for one aspect of the current
+                    state of this API Resource. --- This struct is intended for direct
+                    use as an array at the field path .status.conditions.  For example,
+                    \n type FooStatus struct{ // Represents the observations of a
+                    foo's current state. // Known .status.conditions.type are: \"Available\",
+                    \"Progressing\", and \"Degraded\" // +patchMergeKey=type // +patchStrategy=merge
+                    // +listType=map // +listMapKey=type Conditions []metav1.Condition
+                    `json:\"conditions,omitempty\" patchStrategy:\"merge\" patchMergeKey:\"type\"
+                    protobuf:\"bytes,1,rep,name=conditions\"` \n // other fields }"
+                  properties:
+                    lastTransitionTime:
+                      description: lastTransitionTime is the last time the condition
+                        transitioned from one status to another. This should be when
+                        the underlying condition changed.  If that is not known, then
+                        using the time when the API field changed is acceptable.
+                      format: date-time
+                      type: string
+                    message:
+                      description: message is a human readable message indicating
+                        details about the transition. This may be an empty string.
+                      maxLength: 32768
+                      type: string
+                    observedGeneration:
+                      description: observedGeneration represents the .metadata.generation
+                        that the condition was set based upon. For instance, if .metadata.generation
+                        is currently 12, but the .status.conditions[x].observedGeneration
+                        is 9, the condition is out of date with respect to the current
+                        state of the instance.
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    reason:
+                      description: reason contains a programmatic identifier indicating
+                        the reason for the condition's last transition. Producers
+                        of specific condition types may define expected values and
+                        meanings for this field, and whether the values are considered
+                        a guaranteed API. The value should be a CamelCase string.
+                        This field may not be empty.
+                      maxLength: 1024
+                      minLength: 1
+                      pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                      type: string
+                    status:
+                      description: status of the condition, one of True, False, Unknown.
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                      type: string
+                    type:
+                      description: type of condition in CamelCase or in foo.example.com/CamelCase.
+                        --- Many .condition.type values are consistent across resources
+                        like Available, but because arbitrary conditions can be useful
+                        (see .node.status.conditions), the ability to deconflict is
+                        important. The regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)
+                      maxLength: 316
+                      pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - message
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+              endpoints:
+                description: endpoints for trace and metric gateway.
+                nullable: true
+                properties:
+                  metrics:
+                    description: metrics contains the endpoints for metric gateway
+                      supporting OTLP.
+                    properties:
+                      grpc:
+                        description: GRPC endpoint for OTLP.
+                        type: string
+                      http:
+                        description: HTTP endpoint for OTLP.
+                        type: string
+                    type: object
+                  traces:
+                    description: traces contains the endpoints for trace gateway supporting
+                      OTLP.
+                    properties:
+                      grpc:
+                        description: GRPC endpoint for OTLP.
+                        type: string
+                      http:
+                        description: HTTP endpoint for OTLP.
+                        type: string
+                    type: object
+                type: object
+              state:
+                description: 'State signifies current state of Module CR. Value can
+                  be one of these three: "Ready", "Deleting", or "Warning".'
+                enum:
+                - Deleting
+                - Ready
+                - Warning
+                type: string
+            required:
+            - state
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.11.3
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/component: telemetry
+    app.kubernetes.io/instance: telemetry-operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: telemetry-operator
+    app.kubernetes.io/part-of: kyma
+    control-plane: telemetry-operator
+  name: tracepipelines.telemetry.kyma-project.io
+spec:
+  group: telemetry.kyma-project.io
+  names:
+    kind: TracePipeline
+    listKind: TracePipelineList
+    plural: tracepipelines
+    singular: tracepipeline
+  scope: Cluster
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.conditions[-1].type
+      name: Status
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: TracePipeline is the Schema for the tracepipelines API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: Defines the desired state of TracePipeline
+            properties:
+              output:
+                description: Defines a destination for shipping trace data. Only one
+                  can be defined per pipeline.
+                properties:
+                  otlp:
+                    description: Configures the underlying Otel Collector with an
+                      [OTLP exporter](https://github.com/open-telemetry/opentelemetry-collector/blob/main/exporter/otlpexporter/README.md).
+                      If you switch `protocol`to `http`, an [OTLP HTTP exporter](https://github.com/open-telemetry/opentelemetry-collector/tree/main/exporter/otlphttpexporter)
+                      is used.
+                    properties:
+                      authentication:
+                        description: Defines authentication options for the OTLP output
+                        properties:
+                          basic:
+                            description: Activates `Basic` authentication for the
+                              destination providing relevant Secrets.
+                            properties:
+                              password:
+                                description: Contains the basic auth password or a
+                                  Secret reference.
+                                properties:
+                                  value:
+                                    description: The value as plain text.
+                                    type: string
+                                  valueFrom:
+                                    description: The value as a reference to a resource.
+                                    properties:
+                                      secretKeyRef:
+                                        description: Refers to the value of a specific
+                                          key in a Secret. You must provide `name`
+                                          and `namespace` of the Secret, as well as
+                                          the name of the `key`.
+                                        properties:
+                                          key:
+                                            description: The name of the attribute
+                                              of the Secret holding the referenced
+                                              value.
+                                            type: string
+                                          name:
+                                            description: The name of the Secret containing
+                                              the referenced value
+                                            type: string
+                                          namespace:
+                                            description: The name of the Namespace
+                                              containing the Secret with the referenced
+                                              value.
+                                            type: string
+                                        type: object
+                                    type: object
+                                type: object
+                              user:
+                                description: Contains the basic auth username or a
+                                  Secret reference.
+                                properties:
+                                  value:
+                                    description: The value as plain text.
+                                    type: string
+                                  valueFrom:
+                                    description: The value as a reference to a resource.
+                                    properties:
+                                      secretKeyRef:
+                                        description: Refers to the value of a specific
+                                          key in a Secret. You must provide `name`
+                                          and `namespace` of the Secret, as well as
+                                          the name of the `key`.
+                                        properties:
+                                          key:
+                                            description: The name of the attribute
+                                              of the Secret holding the referenced
+                                              value.
+                                            type: string
+                                          name:
+                                            description: The name of the Secret containing
+                                              the referenced value
+                                            type: string
+                                          namespace:
+                                            description: The name of the Namespace
+                                              containing the Secret with the referenced
+                                              value.
+                                            type: string
+                                        type: object
+                                    type: object
+                                type: object
+                            required:
+                            - password
+                            - user
+                            type: object
+                        type: object
+                      endpoint:
+                        description: Defines the host and port (<host>:<port>) of
+                          an OTLP endpoint.
+                        properties:
+                          value:
+                            description: The value as plain text.
+                            type: string
+                          valueFrom:
+                            description: The value as a reference to a resource.
+                            properties:
+                              secretKeyRef:
+                                description: Refers to the value of a specific key
+                                  in a Secret. You must provide `name` and `namespace`
+                                  of the Secret, as well as the name of the `key`.
+                                properties:
+                                  key:
+                                    description: The name of the attribute of the
+                                      Secret holding the referenced value.
+                                    type: string
+                                  name:
+                                    description: The name of the Secret containing
+                                      the referenced value
+                                    type: string
+                                  namespace:
+                                    description: The name of the Namespace containing
+                                      the Secret with the referenced value.
+                                    type: string
+                                type: object
+                            type: object
+                        type: object
+                      headers:
+                        description: Defines custom headers to be added to outgoing
+                          HTTP or GRPC requests.
+                        items:
+                          properties:
+                            name:
+                              description: Defines the header name.
+                              type: string
+                            value:
+                              description: The value as plain text.
+                              type: string
+                            valueFrom:
+                              description: The value as a reference to a resource.
+                              properties:
+                                secretKeyRef:
+                                  description: Refers to the value of a specific key
+                                    in a Secret. You must provide `name` and `namespace`
+                                    of the Secret, as well as the name of the `key`.
+                                  properties:
+                                    key:
+                                      description: The name of the attribute of the
+                                        Secret holding the referenced value.
+                                      type: string
+                                    name:
+                                      description: The name of the Secret containing
+                                        the referenced value
+                                      type: string
+                                    namespace:
+                                      description: The name of the Namespace containing
+                                        the Secret with the referenced value.
+                                      type: string
+                                  type: object
+                              type: object
+                          required:
+                          - name
+                          type: object
+                        type: array
+                      protocol:
+                        default: grpc
+                        description: Defines the OTLP protocol (http or grpc). Default
+                          is GRPC.
+                        enum:
+                        - grpc
+                        - http
+                        minLength: 1
+                        type: string
+                      tls:
+                        description: Defines TLS options for the OTLP output.
+                        properties:
+                          ca:
+                            description: Defines an optional CA certificate for server
+                              certificate verification when using TLS. The certificate
+                              must be provided in PEM format.
+                            properties:
+                              value:
+                                description: The value as plain text.
+                                type: string
+                              valueFrom:
+                                description: The value as a reference to a resource.
+                                properties:
+                                  secretKeyRef:
+                                    description: Refers to the value of a specific
+                                      key in a Secret. You must provide `name` and
+                                      `namespace` of the Secret, as well as the name
+                                      of the `key`.
+                                    properties:
+                                      key:
+                                        description: The name of the attribute of
+                                          the Secret holding the referenced value.
+                                        type: string
+                                      name:
+                                        description: The name of the Secret containing
+                                          the referenced value
+                                        type: string
+                                      namespace:
+                                        description: The name of the Namespace containing
+                                          the Secret with the referenced value.
+                                        type: string
+                                    type: object
+                                type: object
+                            type: object
+                          cert:
+                            description: Defines a client certificate to use when
+                              using TLS. The certificate must be provided in PEM format.
+                            properties:
+                              value:
+                                description: The value as plain text.
+                                type: string
+                              valueFrom:
+                                description: The value as a reference to a resource.
+                                properties:
+                                  secretKeyRef:
+                                    description: Refers to the value of a specific
+                                      key in a Secret. You must provide `name` and
+                                      `namespace` of the Secret, as well as the name
+                                      of the `key`.
+                                    properties:
+                                      key:
+                                        description: The name of the attribute of
+                                          the Secret holding the referenced value.
+                                        type: string
+                                      name:
+                                        description: The name of the Secret containing
+                                          the referenced value
+                                        type: string
+                                      namespace:
+                                        description: The name of the Namespace containing
+                                          the Secret with the referenced value.
+                                        type: string
+                                    type: object
+                                type: object
+                            type: object
+                          insecure:
+                            description: Defines whether to send requests using plaintext
+                              instead of TLS.
+                            type: boolean
+                          insecureSkipVerify:
+                            description: Defines whether to skip server certificate
+                              verification when using TLS.
+                            type: boolean
+                          key:
+                            description: Defines the client key to use when using
+                              TLS. The key must be provided in PEM format.
+                            properties:
+                              value:
+                                description: The value as plain text.
+                                type: string
+                              valueFrom:
+                                description: The value as a reference to a resource.
+                                properties:
+                                  secretKeyRef:
+                                    description: Refers to the value of a specific
+                                      key in a Secret. You must provide `name` and
+                                      `namespace` of the Secret, as well as the name
+                                      of the `key`.
+                                    properties:
+                                      key:
+                                        description: The name of the attribute of
+                                          the Secret holding the referenced value.
+                                        type: string
+                                      name:
+                                        description: The name of the Secret containing
+                                          the referenced value
+                                        type: string
+                                      namespace:
+                                        description: The name of the Namespace containing
+                                          the Secret with the referenced value.
+                                        type: string
+                                    type: object
+                                type: object
+                            type: object
+                        type: object
+                    required:
+                    - endpoint
+                    type: object
+                required:
+                - otlp
+                type: object
+            required:
+            - output
+            type: object
+          status:
+            description: Shows the observed state of the TracePipeline
+            properties:
+              conditions:
+                description: An array of conditions describing the status of the pipeline.
+                items:
+                  description: TracePipelineCondition contains details for the current
+                    condition of this LogPipeline.
+                  properties:
+                    lastTransitionTime:
+                      description: Point in time the condition transitioned into a
+                        different state.
+                      format: date-time
+                      type: string
+                    reason:
+                      description: Reason of last transition.
+                      type: string
+                    type:
+                      description: 'The possible transition types are:<br>- `Running`:
+                        The instance is ready and usable.<br>- `Pending`: The pipeline
+                        is being activated.'
+                      type: string
+                  type: object
+                type: array
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/component: telemetry
+    app.kubernetes.io/instance: telemetry-operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: telemetry-operator
+    app.kubernetes.io/part-of: kyma
+    control-plane: telemetry-operator
+  name: telemetry-operator
+  namespace: kyma-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    app.kubernetes.io/component: telemetry
+    app.kubernetes.io/instance: telemetry-operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: telemetry-operator
+    app.kubernetes.io/part-of: kyma
+    control-plane: telemetry-operator
+  name: telemetry-operator-leader-election-role
+  namespace: kyma-system
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/component: telemetry
+    app.kubernetes.io/instance: telemetry-operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: telemetry-operator
+    app.kubernetes.io/part-of: kyma
+    control-plane: telemetry-operator
+  name: telemetry-operator-manager-role
+  namespace: kyma-system
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - create
+  - delete
+  - patch
+  - update
+- apiGroups:
+  - ""
+  resources:
+  - serviceaccounts
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - services
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - apps
+  resources:
+  - daemonsets
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - networkpolicies
+  verbs:
+  - create
+  - delete
+  - patch
+  - update
+- apiGroups:
+  - operator.kyma-project.io
+  resources:
+  - telemetries
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - operator.kyma-project.io
+  resources:
+  - telemetries/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - operator.kyma-project.io
+  resources:
+  - telemetries/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - security.istio.io
+  resources:
+  - peerauthentications
+  verbs:
+  - create
+  - delete
+  - patch
+  - update
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/component: telemetry
+    app.kubernetes.io/instance: telemetry-operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: telemetry-operator
+    app.kubernetes.io/part-of: kyma
+    control-plane: telemetry-operator
+  name: telemetry-operator-manager-role
+rules:
+- nonResourceURLs:
+  - /metrics
+  verbs:
+  - get
+- nonResourceURLs:
+  - /metrics/cadvisor
+  verbs:
+  - get
+- apiGroups:
+  - ""
+  resources:
+  - endpoints
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - nodes/metrics
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - nodes/stats
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - services
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - admissionregistration.k8s.io
+  resources:
+  - validatingwebhookconfigurations
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - apps
+  resources:
+  - replicasets
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - networkpolicies
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - operator.kyma-project.io
+  resources:
+  - telemetries
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - clusterrolebindings
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - clusterroles
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - security.istio.io
+  resources:
+  - peerauthentications
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - telemetry.kyma-project.io
+  resources:
+  - logparsers
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - telemetry.kyma-project.io
+  resources:
+  - logparsers/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - telemetry.kyma-project.io
+  resources:
+  - logparsers/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - telemetry.kyma-project.io
+  resources:
+  - logpipelines
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - telemetry.kyma-project.io
+  resources:
+  - logpipelines/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - telemetry.kyma-project.io
+  resources:
+  - logpipelines/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - telemetry.kyma-project.io
+  resources:
+  - metricpipelines
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - telemetry.kyma-project.io
+  resources:
+  - metricpipelines/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - telemetry.kyma-project.io
+  resources:
+  - metricpipelines/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - telemetry.kyma-project.io
+  resources:
+  - tracepipelines
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - telemetry.kyma-project.io
+  resources:
+  - tracepipelines/status
+  verbs:
+  - get
+  - patch
+  - update
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/component: telemetry
+    app.kubernetes.io/instance: telemetry-operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: telemetry-operator
+    app.kubernetes.io/part-of: kyma
+    control-plane: telemetry-operator
+  name: telemetry-operator-leader-election-rolebinding
+  namespace: kyma-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: telemetry-operator-leader-election-role
+subjects:
+- kind: ServiceAccount
+  name: telemetry-operator
+  namespace: kyma-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/component: telemetry
+    app.kubernetes.io/instance: telemetry-operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: telemetry-operator
+    app.kubernetes.io/part-of: kyma
+    control-plane: telemetry-operator
+  name: telemetry-operator-manager-rolebinding
+  namespace: kyma-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: telemetry-operator-manager-role
+subjects:
+- kind: ServiceAccount
+  name: telemetry-operator
+  namespace: kyma-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/component: telemetry
+    app.kubernetes.io/instance: telemetry-operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: telemetry-operator
+    app.kubernetes.io/part-of: kyma
+    control-plane: telemetry-operator
+  name: telemetry-operator-manager-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: telemetry-operator-manager-role
+subjects:
+- kind: ServiceAccount
+  name: telemetry-operator
+  namespace: kyma-system
+---
+apiVersion: v1
+data:
+  details: |-
+    header:
+      - source: >-
+          $each(spec.output, function($v, $k) {$v.url.value or
+          $v.url.valueFrom.secretKeyRef.name or $v.host.value or
+          $v.host.valueFrom.secretKeyRef.name ? $k})
+        placeholder: custom
+        type: string
+        name: Type
+        isSelected: true
+        widget: Text
+      - name: Unsupported-Mode
+        source: status.unsupportedMode
+        widget: Badge
+        highlights:
+          positive:
+            - 'false'
+          negative:
+            - 'true'
+      - source: status.conditions[-1].type
+        name: Status
+        widget: Badge
+    body:
+      - widget: Panel
+        name: Applications
+        children:
+          - widget: Panel
+            name: Namespaces
+            children:
+              - name: Include
+                widget: JoinedArray
+                source: spec.input.application.namespaces.include
+                separator: ', '
+              - name: Exclude
+                widget: JoinedArray
+                source: spec.input.application.namespaces.exclude
+                separator: ', '
+              - name: System Namespaces
+                source: spec.input.application.namespaces.system
+          - widget: Panel
+            name: Containers
+            children:
+              - name: Include
+                widget: JoinedArray
+                source: spec.input.application.containers.include
+                separator: ', '
+              - name: Exclude
+                widget: JoinedArray
+                source: spec.input.application.containers.exclude
+                separator: ', '
+          - widget: Panel
+            name: Other Settings
+            children:
+              - name: Keep Annotations
+                source: spec.input.application.keepAnnotations
+              - name: Drop Labels
+                source: spec.input.application.dropLabels
+      - widget: Panel
+        name: Output
+        children:
+          - name: Custom
+            widget: CodeViewer
+            language: '''plaintext'''
+            source: spec.output.custom
+            visibility: $exists(spec.output.custom)
+          - name: Grafana-Loki
+            widget: Panel
+            visibility: $not($exists(spec.output.custom) or $exists(spec.output.http))
+            children:
+              - name: URL
+                source: spec.output.`grafana-loki`.url.value
+              - name: Labels
+                widget: Labels
+                source: spec.output.`grafana-loki`.labels
+              - name: Remove keys
+                widget: JoinedArray
+                separator: ','
+                source: spec.output.`grafana-loki`.removeKeys
+          - name: HTTP
+            widget: Panel
+            visibility: $exists(spec.output.http)
+            children:
+              - name: Host
+                widget: Panel
+                children:
+                  - name: Value
+                    source: spec.output.http.host.value
+                    visibility: $exists(spec.output.http.host.value)
+                  - name: Value From Secret
+                    widget: ResourceRefs
+                    source: spec.output.http.host.valueFrom.secretKeyRef
+                    kind: Secret
+                    visibility: $exists(spec.output.http.host.valueFrom.secretKeyRef.name)
+              - name: User
+                widget: Panel
+                children:
+                  - name: Value
+                    source: spec.output.http.user.value
+                    visibility: $exists(spec.output.http.user.value)
+                  - name: Value From Secret
+                    widget: ResourceRefs
+                    source: spec.output.http.user.valueFrom.secretKeyRef
+                    kind: Secret
+                    visibility: $exists(spec.output.http.user.valueFrom.secretKeyRef.name)
+              - name: Password
+                widget: Panel
+                children:
+                  - name: Value
+                    source: spec.output.http.password.value
+                    visibility: $exists(spec.output.http.password.value)
+                  - name: Value From Secret
+                    widget: ResourceRefs
+                    source: spec.output.http.password.valueFrom.secretKeyRef
+                    kind: Secret
+                    visibility: $exists(spec.output.http.password.valueFrom.secretKeyRef.name)
+              - name: TLS Settings
+                widget: Panel
+                children:
+                  - name: Disabled
+                    source: spec.output.http.tls.disabled
+                    placeholder: 'false'
+                  - name: Skip certificate validation
+                    source: spec.output.http.tls.skipCertificateValidation
+                    placeholder: 'false'
+                  - name: Ca
+                    widget: Panel
+                    visibility: $exists(spec.output.http.tls.ca)
+                    source: spec.output.http.tls.ca
+                    children:
+                      - name: Value
+                        source: value
+                        visibility: $exists(value)
+                      - name: Value From Secret
+                        widget: ResourceRefs
+                        source: valueFrom.secretKeyRef
+                        kind: Secret
+                        visibility: $exists(valueFrom.secretKeyRef.name)
+                  - name: Cert
+                    widget: Panel
+                    visibility: $exists(spec.output.http.tls.cert)
+                    source: spec.output.http.tls.cert
+                    children:
+                      - name: Value
+                        source: value
+                        visibility: $exists(value)
+                      - name: Value From Secret
+                        widget: ResourceRefs
+                        source: valueFrom.secretKeyRef
+                        kind: Secret
+                        visibility: $exists(valueFrom.secretKeyRef.name)
+                  - name: Key
+                    widget: Panel
+                    visibility: $exists(spec.output.http.tls.key)
+                    source: spec.output.http.tls.key
+                    children:
+                      - name: Value
+                        source: value
+                        visibility: $exists(value)
+                      - name: Value From Secret
+                        widget: ResourceRefs
+                        source: valueFrom.secretKeyRef
+                        kind: Secret
+                        visibility: $exists(valueFrom.secretKeyRef.name)
+              - name: Other Settings
+                widget: Panel
+                children:
+                  - name: Compression
+                    source: spec.output.http.compress
+                  - name: De-dot
+                    source: spec.output.http.dedot
+                    placeholder: 'false'
+                  - name: Format
+                    source: spec.output.http.format
+                    placeholder: json
+                  - name: Port
+                    source: spec.output.http.port
+                    placeholder: '443'
+                  - name: URI
+                    source: spec.output.http.uri
+  form: |
+    - path: spec.input
+      widget: FormGroup
+      defaultExpanded: true
+      children:
+        - name: Include Namespaces
+          widget: SimpleList
+          path: application.namespaces.include
+          defaultExpanded: true
+          inputInfo: Include container logs from selected namespaces
+          children:
+            - path: '[]'
+        - name: Exclude Namespaces
+          widget: SimpleList
+          path: application.namespaces.exclude
+          children:
+            - path: '[]'
+        - name: Include System Namespaces
+          path: application.namespaces.system
+        - name: Include Containers
+          widget: SimpleList
+          path: application.containers.include
+        - name: Exclude Containers
+          widget: SimpleList
+          path: application.containers.exclude
+        - name: Keep Annotations
+          path: application.keepAnnotations
+        - name: Drop Labels
+          path: application.dropLabels
+    - name: Filters
+      widget: SimpleList
+      path: spec.filters
+      children:
+        - widget: FormGroup
+          path: '[]'
+          children:
+            - widget: CodeEditor
+              path: custom
+    - path: spec.output
+      widget: FormGroup
+      defaultExpanded: true
+      simple: true
+      children:
+        - name: Custom
+          path: custom
+          widget: CodeEditor
+          advanced: true
+          inputInfo: >-
+            Note: If you use a custom output, you put the LogPipeline in unsupported
+            mode
+            (https://kyma-project.io/#/telemetry-manager/user/02-logs?id=unsupported-mode)
+        - name: HTTP
+          path: http
+          widget: FormGroup
+          defaultExpanded: true
+          simple: true
+          children:
+            - name: Host
+              path: host
+              simple: true
+              widget: FormGroup
+              children:
+                - name: Value
+                  path: value
+                  simple: true
+                  widget: Text
+                - name: Secret Reference
+                  path: valueFrom.secretKeyRef
+                  simple: true
+                  widget: ResourceRef
+                  resource:
+                    kind: secret
+                    version: v1
+                  children:
+                    - path: key
+                      simple: true
+                      enum: $keys($secret.data)
+            - name: User
+              path: user
+              simple: true
+              widget: FormGroup
+              children:
+                - name: Value
+                  path: value
+                  simple: true
+                  widget: Text
+                - name: Secret Reference
+                  path: valueFrom.secretKeyRef
+                  simple: true
+                  widget: ResourceRef
+                  resource:
+                    kind: secret
+                    version: v1
+                  children:
+                    - path: key
+                      simple: true
+                      enum: $keys($secret.data)
+            - name: Password
+              path: password
+              simple: true
+              widget: FormGroup
+              children:
+                - name: Value
+                  path: value
+                  simple: true
+                  widget: Text
+                - name: Secret Reference
+                  path: valueFrom.secretKeyRef
+                  simple: true
+                  widget: ResourceRef
+                  resource:
+                    kind: secret
+                    version: v1
+                  children:
+                    - path: key
+                      simple: true
+                      enum: $keys($secret.data)
+            - name: TLS
+              widget: FormGroup
+              path: tls
+              children:
+                - name: Disabled
+                  path: disabled
+                - name: Skip Certificate Validation
+                  path: skipCertificateValidation
+                - name: CA
+                  path: ca
+                  widget: FormGroup
+                  simple: true
+                  children:
+                    - name: Value
+                      path: value
+                      widget: Text
+                      simple: true
+                    - name: Secret Reference
+                      path: valueFrom.secretKeyRef
+                      widget: ResourceRef
+                      simple: true
+                      resource:
+                        kind: secret
+                        version: v1
+                      children:
+                        - simple: true
+                          path: key
+                          enum: $keys($secret.data)
+                - name: Cert
+                  path: cert
+                  widget: FormGroup
+                  simple: true
+                  children:
+                    - name: Value
+                      path: value
+                      widget: Text
+                      simple: true
+                    - name: Secret Reference
+                      path: valueFrom.secretKeyRef
+                      widget: ResourceRef
+                      simple: true
+                      resource:
+                        kind: secret
+                        version: v1
+                      children:
+                        - simple: true
+                          path: key
+                          enum: $keys($secret.data)
+                - name: Key
+                  path: key
+                  widget: FormGroup
+                  simple: true
+                  children:
+                    - name: Value
+                      path: value
+                      widget: Text
+                      simple: true
+                    - name: Secret Reference
+                      path: valueFrom.secretKeyRef
+                      widget: ResourceRef
+                      simple: true
+                      resource:
+                        kind: secret
+                        version: v1
+                      children:
+                        - simple: true
+                          path: key
+                          enum: $keys($secret.data)
+            - name: URI
+              path: uri
+              widget: Text
+            - name: Port
+              path: port
+              widget: Text
+            - name: Compress
+              path: compress
+              widget: Text
+            - name: Format
+              path: format
+              widget: Text
+            - name: Dedot
+              simple: true
+              path: dedot
+  general: |-
+    resource:
+      kind: LogPipeline
+      group: telemetry.kyma-project.io
+      version: v1alpha1
+    name: Log Pipelines
+    category: Observability
+    urlPath: logpipelines
+    scope: cluster
+    description: >-
+      {{[LogPipeline](https://kyma-project.io/#/telemetry-manager/user/resources/02-logpipeline)}} configures log selection, filters, and outputs.
+  list: |-
+    - source: >-
+        $each(spec.output, function($v, $k) {$v.url.value or
+        $v.url.valueFrom.secretKeyRef.name or $v.host.value or
+        $v.host.valueFrom.secretKeyRef.name ? $k})
+      placeholder: custom
+      type: string
+      name: Type
+      isSelected: true
+      widget: Text
+    - name: Unsupported-Mode
+      source: status.unsupportedMode
+      widget: Badge
+      highlights:
+        positive:
+          - 'false'
+        negative:
+          - 'true'
+    - source: status.conditions[-1].type
+      name: Status
+      widget: Badge
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/component: telemetry
+    app.kubernetes.io/instance: telemetry-operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: telemetry-operator
+    app.kubernetes.io/part-of: kyma
+    busola.io/extension: resource
+    busola.io/extension-version: "0.5"
+    control-plane: telemetry-operator
+  name: telemetry-logpipelines
+  namespace: kyma-system
+---
+apiVersion: v1
+data:
+  details: |-
+    header:
+      - source: >-
+          $each(spec.output, function($v, $k) {$v.endpoint.value or
+          $v.endpoint.valueFrom.secretKeyRef.name ? $k})
+        placeholder: custom
+        type: string
+        name: Type
+        isSelected: true
+        widget: Text
+    body:
+      - name: Status
+        widget: Panel
+        children:
+        - source: status.endpoints.traces.grpc
+          name: OTLP GRPC Trace Endpoint
+        - source: status.endpoints.traces.http
+          name: OTLP HTTP Trace Endpoint
+      - source: status.conditions
+        widget: Table
+        name: Reconciliation Conditions
+        children:
+          - source: type
+            name: Type
+          - source: status
+            name: Status
+            widget: Badge
+            highlights:
+              success:
+                - 'True'
+              error:
+                - 'False'
+          - source: reason
+            name: Reason
+          - source: message
+            name: Message
+          - source: '$readableTimestamp(lastTransitionTime)'
+            name: Last transition
+            sort: true
+      - widget: Panel
+        name: Input
+        children:
+          - name: Prometheus
+            widget: Panel
+            visibility: $exists(spec.input.prometheus)
+            children:
+              - name: Enabled
+                visibility: $exists(spec.input.prometheus.enabled)
+                source: spec.input.prometheus.enabled
+              - name: Include Namespaces
+                widget: JoinedArray
+                visibility: $exists(spec.input.prometheus.namespaces.include)
+                source: spec.input.prometheus.namespaces.include
+                separator: ', '
+              - name: Exclude Namespaces
+                widget: JoinedArray
+                visibility: $exists(spec.input.prometheus.namespaces.exclude)
+                source: spec.input.prometheus.namespaces.exclude
+                separator: ', '
+          - name: Istio
+            widget: Panel
+            visibility: $exists(spec.input.istio)
+            children:
+              - name: Enabled
+                visibility: $exists(spec.input.istio.enabled)
+                source: spec.input.istio.enabled
+              - name: Include Namespaces
+                widget: JoinedArray
+                visibility: $exists(spec.input.istio.namespaces.include)
+                source: spec.input.istio.namespaces.include
+                separator: ', '
+              - name: Exclude Namespaces
+                widget: JoinedArray
+                visibility: $exists(spec.input.istio.namespaces.exclude)
+                source: spec.input.istio.namespaces.exclude
+                separator: ', '
+          - name: Runtime
+            widget: Panel
+            visibility: $exists(spec.input.runtime)
+            children:
+              - name: Enabled
+                visibility: $exists(spec.input.runtime.enabled)
+                source: spec.input.runtime.enabled
+              - name: Include Namespaces
+                widget: JoinedArray
+                visibility: $exists(spec.input.runtime.namespaces.include)
+                source: spec.input.runtime.namespaces.include
+                separator: ', '
+              - name: Exclude Namespaces
+                widget: JoinedArray
+                visibility: $exists(spec.input.runtime.namespaces.exclude)
+                source: spec.input.runtime.namespaces.exclude
+                separator: ', '
+          - name: OTLP
+            widget: Panel
+            visibility: $exists(spec.input.otlp)
+            children:
+              - name: Disabled
+                visibility: $exists(spec.input.otlp.disabled)
+                source: spec.input.otlp.disabled
+              - name: Include Namespaces
+                widget: JoinedArray
+                visibility: $exists(spec.input.otlp.namespaces.include)
+                source: spec.input.otlp.namespaces.include
+                separator: ', '
+              - name: Exclude Namespaces
+                widget: JoinedArray
+                visibility: $exists(spec.input.otlp.namespaces.exclude)
+                source: spec.input.otlp.namespaces.exclude
+                separator: ', '
+      - widget: Panel
+        name: Output
+        children:
+          - name: OTLP
+            widget: Panel
+            visibility: $exists(spec.output.otlp)
+            children:
+              - name: Endpoint
+                widget: Panel
+                visibility: $exists(spec.output.otlp.endpoint)
+                children:
+                  - name: Value
+                    source: spec.output.otlp.endpoint.value
+                    visibility: $exists(spec.output.otlp.endpoint.value)
+                  - name: Value From Secret
+                    widget: ResourceRefs
+                    source: spec.output.otlp.endpoint.valueFrom.secretKeyRef
+                    kind: Secret
+                    visibility: $exists(spec.output.otlp.endpoint.valueFrom.secretKeyRef.name)
+              - name: Authentication
+                widget: Panel
+                visibility: $exists(spec.output.otlp.authentication)
+                children:
+                  - name: User
+                    widget: Panel
+                    visibility: $exists(spec.output.otlp.authentication.basic.user)
+                    children:
+                      - name: Value
+                        source: spec.output.otlp.authentication.basic.user.value
+                        visibility: $exists(spec.output.otlp.authentication.basic.user.value)
+                      - name: Value From Secret
+                        widget: ResourceRefs
+                        source: >-
+                          spec.output.otlp.authentication.basic.user.valueFrom.secretKeyRef
+                        kind: Secret
+                        visibility: >-
+                          $exists(spec.output.otlp.authentication.basic.user.valueFrom.secretKeyRef.name)
+                  - name: Password
+                    widget: Panel
+                    visibility: $exists(spec.output.otlp.authentication.basic.password)
+                    children:
+                      - name: Value
+                        source: spec.output.otlp.authentication.basic.password.value
+                        visibility: >-
+                          $exists(spec.output.otlp.authentication.basic.password.value)
+                      - name: Value From Secret
+                        widget: ResourceRefs
+                        source: >-
+                          spec.output.otlp.authentication.basic.password.valueFrom.secretKeyRef
+                        kind: Secret
+                        visibility: >-
+                          $exists(spec.output.otlp.authentication.basic.password.valueFrom.secretKeyRef.name)
+              - name: Headers
+                widget: Panel
+                visibility: $exists(spec.output.otlp.headers)
+                children:
+                  - name: Header
+                    widget: Panel
+                    visibility: $exists(spec.output.otlp.headers[].name)
+                    source: spec.output.otlp.headers[]
+                    children:
+                      - name: Name
+                        source: name
+                        visibility: $exists(name)
+                      - name: Value
+                        source: value
+                        visibility: $exists(value)
+                      - name: Value From Secret
+                        widget: ResourceRefs
+                        source: valueFrom.secretKeyRef
+                        kind: Secret
+                        visibility: $exists(valueFrom.secretKeyRef.name)
+              - name: TLS
+                widget: Panel
+                visibility: $exists(spec.output.otlp.tls)
+                children:
+                  - name: Insecure
+                    visibility: $exists(spec.output.otlp.tls.insecure)
+                    source: spec.output.otlp.tls.insecure
+                  - name: Skip Cert Verification
+                    visibility: $exists(spec.output.otlp.tls.insecureSkipVerify)
+                    source: spec.output.otlp.tls.insecureSkipVerify
+                  - name: Ca
+                    widget: Panel
+                    visibility: $exists(spec.output.otlp.tls.ca)
+                    source: spec.output.otlp.tls.ca
+                    children:
+                      - name: Value
+                        source: value
+                        visibility: $exists(value)
+                      - name: Value From Secret
+                        widget: ResourceRefs
+                        source: valueFrom.secretKeyRef
+                        kind: Secret
+                        visibility: $exists(valueFrom.secretKeyRef.name)
+                  - name: Cert
+                    widget: Panel
+                    visibility: $exists(spec.output.otlp.tls.cert)
+                    source: spec.output.otlp.tls.cert
+                    children:
+                      - name: Value
+                        source: value
+                        visibility: $exists(value)
+                      - name: Value From Secret
+                        widget: ResourceRefs
+                        source: valueFrom.secretKeyRef
+                        kind: Secret
+                        visibility: $exists(valueFrom.secretKeyRef.name)
+                  - name: Key
+                    widget: Panel
+                    visibility: $exists(spec.output.otlp.tls.key)
+                    source: spec.output.otlp.tls.key
+                    children:
+                      - name: Value
+                        source: value
+                        visibility: $exists(value)
+                      - name: Value From Secret
+                        widget: ResourceRefs
+                        source: valueFrom.secretKeyRef
+                        kind: Secret
+                        visibility: $exists(valueFrom.secretKeyRef.name)
+              - widget: Panel
+                name: Other Settings
+                children:
+                  - name: Protocol
+                    source: spec.output.otlp.protocol
+  form: |
+    - path: spec.input
+      widget: FormGroup
+      defaultExpanded: true
+      simple: true
+      children:
+        - name: Prometheus
+          path: prometheus
+          widget: FormGroup
+          simple: true
+          children:
+            - name: Enabled
+              path: enabled
+              simple: true
+            - name: Include Namespaces
+              widget: SimpleList
+              path: namespaces.include
+              defaultExpanded: true
+              children:
+                - path: '[]'
+            - name: Exclude Namespaces
+              widget: SimpleList
+              path: namespaces.exclude
+              defaultExpanded: true
+              children:
+                - path: '[]'
+        - name: Istio
+          path: istio
+          widget: FormGroup
+          simple: true
+          children:
+            - name: Enabled
+              path: enabled
+              simple: true
+            - name: Include Namespaces
+              widget: SimpleList
+              path: namespaces.include
+              defaultExpanded: true
+              children:
+                - path: '[]'
+            - name: Exclude Namespaces
+              widget: SimpleList
+              path: namespaces.exclude
+              defaultExpanded: true
+              children:
+                - path: '[]'
+        - name: Runtime
+          path: runtime
+          widget: FormGroup
+          simple: true
+          children:
+            - name: Enabled
+              path: enabled
+              simple: true
+            - name: Include Namespaces
+              widget: SimpleList
+              path: namespaces.include
+              defaultExpanded: true
+              children:
+                - path: '[]'
+            - name: Exclude Namespaces
+              widget: SimpleList
+              path: namespaces.exclude
+              defaultExpanded: true
+              children:
+                - path: '[]'
+        - name: OTLP
+          path: otlp
+          widget: FormGroup
+          simple: true
+          children:
+            - name: Disabled
+              path: disabled
+              simple: true
+            - name: Include Namespaces
+              widget: SimpleList
+              path: namespaces.include
+              defaultExpanded: true
+              children:
+                - path: '[]'
+            - name: Exclude Namespaces
+              widget: SimpleList
+              path: namespaces.exclude
+              defaultExpanded: true
+              children:
+                - path: '[]'
+    - path: spec.output
+      widget: FormGroup
+      defaultExpanded: true
+      simple: true
+      children:
+        - name: OTLP
+          path: otlp
+          widget: FormGroup
+          defaultExpanded: true
+          simple: true
+          children:
+            - name: Endpoint
+              path: endpoint
+              widget: FormGroup
+              simple: true
+              children:
+                - name: Value
+                  path: value
+                  widget: Text
+                  simple: true
+                - name: Secret Reference
+                  path: valueFrom.secretKeyRef
+                  widget: ResourceRef
+                  simple: true
+                  resource:
+                    kind: secret
+                    version: v1
+                  children:
+                    - simple: true
+                      path: key
+                      enum: $keys($secret.data)
+            - name: Protocol
+              path: protocol
+              simple: true
+              widget: FormGroup
+              children:
+                - name: Value
+                  widget: Text
+            - name: Authentication
+              path: authentication
+              widget: FormGroup
+              simple: true
+              children:
+                - name: User
+                  path: basic.user
+                  widget: FormGroup
+                  simple: true
+                  children:
+                    - name: Value
+                      path: value
+                      widget: Text
+                      simple: true
+                    - name: Secret Reference
+                      path: valueFrom.secretKeyRef
+                      widget: ResourceRef
+                      resource:
+                        kind: secret
+                        version: v1
+                      simple: true
+                      children:
+                        - simple: true
+                          path: key
+                          enum: $keys($secret.data)
+                - name: Password
+                  path: basic.password
+                  widget: FormGroup
+                  simple: true
+                  children:
+                    - name: Value
+                      path: value
+                      widget: Text
+                      simple: true
+                    - name: Secret Reference
+                      path: valueFrom.secretKeyRef
+                      widget: ResourceRef
+                      resource:
+                        kind: secret
+                        version: v1
+                      simple: true
+                      children:
+                        - simple: true
+                          path: key
+                          enum: $keys($secret.data)
+            - name: Headers
+              path: headers[]
+              widget: FormGroup
+              simple: true
+              children:
+                - name: Name
+                  path: name
+                  widget: Text
+                  simple: true
+                - name: Value
+                  path: value
+                  widget: Text
+                  simple: true
+                - name: Secret Reference
+                  path: valueFrom.secretKeyRef
+                  widget: ResourceRef
+                  simple: true
+                  resource:
+                    kind: secret
+                    version: v1
+                  children:
+                    - simple: true
+                      path: key
+                      enum: $keys($secret.data)
+            - name: TLS
+              widget: FormGroup
+              path: tls
+              children:
+                - name: Insecure
+                  path: insecure
+                - name: Skip Certificate Validation
+                  path: insecureSkipVerify
+                - name: CA
+                  path: ca
+                  widget: FormGroup
+                  simple: true
+                  children:
+                    - name: Value
+                      path: value
+                      widget: Text
+                      simple: true
+                    - name: Secret Reference
+                      path: valueFrom.secretKeyRef
+                      widget: ResourceRef
+                      simple: true
+                      resource:
+                        kind: secret
+                        version: v1
+                      children:
+                        - simple: true
+                          path: key
+                          enum: $keys($secret.data)
+                - name: Cert
+                  path: cert
+                  widget: FormGroup
+                  simple: true
+                  children:
+                    - name: Value
+                      path: value
+                      widget: Text
+                      simple: true
+                    - name: Secret Reference
+                      path: valueFrom.secretKeyRef
+                      widget: ResourceRef
+                      simple: true
+                      resource:
+                        kind: secret
+                        version: v1
+                      children:
+                        - simple: true
+                          path: key
+                          enum: $keys($secret.data)
+                - name: Key
+                  path: key
+                  widget: FormGroup
+                  simple: true
+                  children:
+                    - name: Value
+                      path: value
+                      widget: Text
+                      simple: true
+                    - name: Secret Reference
+                      path: valueFrom.secretKeyRef
+                      widget: ResourceRef
+                      simple: true
+                      resource:
+                        kind: secret
+                        version: v1
+                      children:
+                        - simple: true
+                          path: key
+                          enum: $keys($secret.data)
+  general: |-
+    resource:
+      kind: MetricPipeline
+      group: telemetry.kyma-project.io
+      version: v1alpha1
+    name: Metric Pipelines
+    category: Observability
+    urlPath: metricpipelines
+    scope: cluster
+    description: >-
+      {{[MetricPipeline](https://kyma-project.io/#/telemetry-manager/user/resources/05-metricpipeline)}} configures a custom Metric Pipeline
+  list: |-
+    - source: >-
+        $each(spec.output, function($v, $k) {$v.endpoint.value or
+        $v.endpoint.valueFrom.secretKeyRef.name ? $k})
+      placeholder: custom
+      type: string
+      name: Type
+      isSelected: true
+      widget: Text
+    - name: Status
+      source: status.conditions
+      widget: Columns
+      children:
+        - name: Type
+          source: type
+          widget: Badge
+        - name: Status
+          source: status
+          widget: Badge
+          highlights:
+            success:
+              - 'True'
+            error:
+              - 'False'
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/component: telemetry
+    app.kubernetes.io/instance: telemetry-operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: telemetry-operator
+    app.kubernetes.io/part-of: kyma
+    busola.io/extension: resource
+    busola.io/extension-version: "0.5"
+    control-plane: telemetry-operator
+  name: telemetry-metricpipelines
+  namespace: kyma-system
+---
+apiVersion: v1
+data:
+  details: |
+    header:
+      - name: State
+        source: status.state
+        widget: Badge
+
+    body:
+      - name: Trace
+        widget: Panel
+        visibility: $exists(spec.trace.gateway.scaling.static.replicas)
+        children:
+        - name: Gateway Replicas
+          source: spec.trace.gateway.scaling.static.replicas
+        - name: Scaling Type
+          source: spec.trace.gateway.scaling.type
+      - name: Status
+        widget: Panel
+        children:
+        - source: status.endpoints.traces.grpc
+          name: OTLP GRPC Trace Endpoint
+        - source: status.endpoints.traces.http
+          name: OTLP HTTP Trace Endpoint
+        - source: status.endpoints.metrics.grpc
+          name: OTLP GRPC Metric Endpoint
+        - source: status.endpoints.metrics.http
+          name: OTLP HTTP Metric Endpoint
+      - source: status.conditions
+        widget: Table
+        name: Reconciliation Conditions
+        children:
+          - source: type
+            name: Type
+          - source: status
+            name: Status
+            widget: Badge
+            highlights:
+              success:
+                - 'True'
+              error:
+                - 'False'
+          - source: reason
+            name: Reason
+          - source: message
+            name: Message
+          - source: '$readableTimestamp(lastTransitionTime)'
+            name: Last transition
+            sort: true
+  form: |
+    - advanced: true
+      defaultExpanded: false
+      readOnly: false
+      decodable: false
+      path: spec.trace
+      name: Trace
+      widget: FormGroup
+      children:
+        - advanced: true
+          defaultExpanded: false
+          readOnly: false
+          decodable: false
+          path: gateway
+          name: Gateway
+          widget: FormGroup
+          children:
+            - advanced: true
+              defaultExpanded: false
+              readOnly: false
+              decodable: false
+              path: scaling
+              name: Scaling
+              widget: FormGroup
+              children:
+                - path: type
+                  override: false
+                  enum:
+                    - None
+                - advanced: true
+                  defaultExpanded: false
+                  readOnly: false
+                  decodable: false
+                  visibility: "$item.spec.trace.gateway.scaling.type = 'Static'"
+                  path: static
+                  name: Static
+                  widget: FormGroup
+                  children:
+                    - advanced: true
+                      defaultExpanded: false
+                      readOnly: false
+                      decodable: false
+                      path: replicas
+                      name: Replicas
+                      simple: false
+                      widget: Text
+  general: |
+    resource:
+      kind: Telemetry
+      group: operator.kyma-project.io
+      version: v1alpha1
+    name: Telemetry
+    category: Kyma
+    urlPath: telemetries
+    scope: namespace
+    description: >-
+      The {{[Telemetry](https://kyma-project.io/#/telemetry-manager/user/resources/01-telemetry)}} resource configures the telemetry module.
+    features:
+      actions:
+        disableCreate: true
+        disableDelete: true
+  list: |
+    - name: State
+      source: status.state
+      widget: Badge
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/component: telemetry
+    app.kubernetes.io/instance: telemetry-operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: telemetry-operator
+    app.kubernetes.io/part-of: kyma
+    busola.io/extension: resource
+    busola.io/extension-version: "0.5"
+    control-plane: telemetry-operator
+  name: telemetry-module
+  namespace: kyma-system
+---
+apiVersion: v1
+data:
+  details: |-
+    header:
+      - source: >-
+          $each(spec.output, function($v, $k) {$v.endpoint.value or
+          $v.endpoint.valueFrom.secretKeyRef.name ? $k})
+        placeholder: custom
+        type: string
+        name: Type
+        isSelected: true
+        widget: Text
+      - source: status.conditions[-1].type
+        name: Status
+        widget: Badge
+    body:
+      - widget: Panel
+        name: Output
+        children:
+          - name: OTLP
+            widget: Panel
+            visibility: $exists(spec.output.otlp)
+            children:
+              - name: Endpoint
+                widget: Panel
+                visibility: $exists(spec.output.otlp.endpoint)
+                children:
+                  - name: Value
+                    source: spec.output.otlp.endpoint.value
+                    visibility: $exists(spec.output.otlp.endpoint.value)
+                  - name: Value From Secret
+                    widget: ResourceRefs
+                    source: spec.output.otlp.endpoint.valueFrom.secretKeyRef
+                    kind: Secret
+                    visibility: $exists(spec.output.otlp.endpoint.valueFrom.secretKeyRef.name)
+              - name: Authentication
+                widget: Panel
+                visibility: $exists(spec.output.otlp.authentication)
+                children:
+                  - name: User
+                    widget: Panel
+                    visibility: $exists(spec.output.otlp.authentication.basic.user)
+                    children:
+                      - name: Value
+                        source: spec.output.otlp.authentication.basic.user.value
+                        visibility: $exists(spec.output.otlp.authentication.basic.user.value)
+                      - name: Value From Secret
+                        widget: ResourceRefs
+                        source: >-
+                          spec.output.otlp.authentication.basic.user.valueFrom.secretKeyRef
+                        kind: Secret
+                        visibility: >-
+                          $exists(spec.output.otlp.authentication.basic.user.valueFrom.secretKeyRef.name)
+                  - name: Password
+                    widget: Panel
+                    visibility: $exists(spec.output.otlp.authentication.basic.password)
+                    children:
+                      - name: Value
+                        source: spec.output.otlp.authentication.basic.password.value
+                        visibility: >-
+                          $exists(spec.output.otlp.authentication.basic.password.value)
+                      - name: Value From Secret
+                        widget: ResourceRefs
+                        source: >-
+                          spec.output.otlp.authentication.basic.password.valueFrom.secretKeyRef
+                        kind: Secret
+                        visibility: >-
+                          $exists(spec.output.otlp.authentication.basic.password.valueFrom.secretKeyRef.name)
+              - name: Headers
+                widget: Panel
+                visibility: $exists(spec.output.otlp.headers)
+                children:
+                  - name: Header
+                    widget: Panel
+                    visibility: $exists(spec.output.otlp.headers[].name)
+                    source: spec.output.otlp.headers[]
+                    children:
+                      - name: Name
+                        source: name
+                        visibility: $exists(name)
+                      - name: Value
+                        source: value
+                        visibility: $exists(value)
+                      - name: Value From Secret
+                        widget: ResourceRefs
+                        source: valueFrom.secretKeyRef
+                        kind: Secret
+                        visibility: $exists(valueFrom.secretKeyRef.name)
+              - name: TLS
+                widget: Panel
+                visibility: $exists(spec.output.otlp.tls)
+                children:
+                  - name: Insecure
+                    visibility: $exists(spec.output.otlp.tls.insecure)
+                    source: spec.output.otlp.tls.insecure
+                  - name: Skip Cert Verification
+                    visibility: $exists(spec.output.otlp.tls.insecureSkipVerify)
+                    source: spec.output.otlp.tls.insecureSkipVerify
+                  - name: Ca
+                    widget: Panel
+                    visibility: $exists(spec.output.otlp.tls.ca)
+                    source: spec.output.otlp.tls.ca
+                    children:
+                      - name: Value
+                        source: value
+                        visibility: $exists(value)
+                      - name: Value From Secret
+                        widget: ResourceRefs
+                        source: valueFrom.secretKeyRef
+                        kind: Secret
+                        visibility: $exists(valueFrom.secretKeyRef.name)
+                  - name: Cert
+                    widget: Panel
+                    visibility: $exists(spec.output.otlp.tls.cert)
+                    source: spec.output.otlp.tls.cert
+                    children:
+                      - name: Value
+                        source: value
+                        visibility: $exists(value)
+                      - name: Value From Secret
+                        widget: ResourceRefs
+                        source: valueFrom.secretKeyRef
+                        kind: Secret
+                        visibility: $exists(valueFrom.secretKeyRef.name)
+                  - name: Key
+                    widget: Panel
+                    visibility: $exists(spec.output.otlp.tls.key)
+                    source: spec.output.otlp.tls.key
+                    children:
+                      - name: Value
+                        source: value
+                        visibility: $exists(value)
+                      - name: Value From Secret
+                        widget: ResourceRefs
+                        source: valueFrom.secretKeyRef
+                        kind: Secret
+                        visibility: $exists(valueFrom.secretKeyRef.name)
+              - widget: Panel
+                name: Other Settings
+                children:
+                  - name: Protocol
+                    source: spec.output.otlp.protocol
+  form: |
+    - path: spec.output
+      widget: FormGroup
+      defaultExpanded: true
+      simple: true
+      children:
+        - name: OTLP
+          path: otlp
+          widget: FormGroup
+          defaultExpanded: true
+          simple: true
+          children:
+            - name: Endpoint
+              path: endpoint
+              widget: FormGroup
+              simple: true
+              children:
+                - name: Value
+                  path: value
+                  widget: Text
+                  simple: true
+                - name: Secret Reference
+                  path: valueFrom.secretKeyRef
+                  widget: ResourceRef
+                  simple: true
+                  resource:
+                    kind: secret
+                    version: v1
+                  children:
+                    - simple: true
+                      path: key
+                      enum: $keys($secret.data)
+            - name: Protocol
+              path: protocol
+              simple: true
+              widget: FormGroup
+              children:
+                - name: Value
+                  widget: Text
+            - name: Authentication
+              path: authentication
+              widget: FormGroup
+              simple: true
+              children:
+                - name: User
+                  path: basic.user
+                  widget: FormGroup
+                  simple: true
+                  children:
+                    - name: Value
+                      path: value
+                      widget: Text
+                      simple: true
+                    - name: Secret Reference
+                      path: valueFrom.secretKeyRef
+                      widget: ResourceRef
+                      resource:
+                        kind: secret
+                        version: v1
+                      simple: true
+                      children:
+                        - simple: true
+                          path: key
+                          enum: $keys($secret.data)
+                - name: Password
+                  path: basic.password
+                  widget: FormGroup
+                  simple: true
+                  children:
+                    - name: Value
+                      path: value
+                      widget: Text
+                      simple: true
+                    - name: Secret Reference
+                      path: valueFrom.secretKeyRef
+                      widget: ResourceRef
+                      resource:
+                        kind: secret
+                        version: v1
+                      simple: true
+                      children:
+                        - simple: true
+                          path: key
+                          enum: $keys($secret.data)
+            - name: Headers
+              path: headers[]
+              widget: FormGroup
+              simple: true
+              children:
+                - name: Name
+                  path: name
+                  widget: Text
+                  simple: true
+                - name: Value
+                  path: value
+                  widget: Text
+                  simple: true
+                - name: Secret Reference
+                  path: valueFrom.secretKeyRef
+                  widget: ResourceRef
+                  simple: true
+                  resource:
+                    kind: secret
+                    version: v1
+                  children:
+                    - simple: true
+                      path: key
+                      enum: $keys($secret.data)
+            - name: TLS
+              widget: FormGroup
+              path: tls
+              children:
+                - name: Insecure
+                  path: insecure
+                - name: Skip Certificate Validation
+                  path: insecureSkipVerify
+                - name: CA
+                  path: ca
+                  widget: FormGroup
+                  simple: true
+                  children:
+                    - name: Value
+                      path: value
+                      widget: Text
+                      simple: true
+                    - name: Secret Reference
+                      path: valueFrom.secretKeyRef
+                      widget: ResourceRef
+                      simple: true
+                      resource:
+                        kind: secret
+                        version: v1
+                      children:
+                        - simple: true
+                          path: key
+                          enum: $keys($secret.data)
+                - name: Cert
+                  path: cert
+                  widget: FormGroup
+                  simple: true
+                  children:
+                    - name: Value
+                      path: value
+                      widget: Text
+                      simple: true
+                    - name: Secret Reference
+                      path: valueFrom.secretKeyRef
+                      widget: ResourceRef
+                      simple: true
+                      resource:
+                        kind: secret
+                        version: v1
+                      children:
+                        - simple: true
+                          path: key
+                          enum: $keys($secret.data)
+                - name: Key
+                  path: key
+                  widget: FormGroup
+                  simple: true
+                  children:
+                    - name: Value
+                      path: value
+                      widget: Text
+                      simple: true
+                    - name: Secret Reference
+                      path: valueFrom.secretKeyRef
+                      widget: ResourceRef
+                      simple: true
+                      resource:
+                        kind: secret
+                        version: v1
+                      children:
+                        - simple: true
+                          path: key
+                          enum: $keys($secret.data)
+  general: |-
+    resource:
+      kind: TracePipeline
+      group: telemetry.kyma-project.io
+      version: v1alpha1
+    name: Trace Pipelines
+    category: Observability
+    urlPath: tracepipelines
+    scope: cluster
+    description: >-
+      {{[TracePipeline](https://kyma-project.io/#/telemetry-manager/user/resources/04-tracepipeline)}} configures a custom Trace Pipeline
+  list: |-
+    - source: >-
+        $each(spec.output, function($v, $k) {$v.endpoint.value or
+        $v.endpoint.valueFrom.secretKeyRef.name ? $k})
+      placeholder: custom
+      type: string
+      name: Type
+      isSelected: true
+      widget: Text
+    - source: status.conditions[-1].type
+      name: Status
+      widget: Badge
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/component: telemetry
+    app.kubernetes.io/instance: telemetry-operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: telemetry-operator
+    app.kubernetes.io/part-of: kyma
+    busola.io/extension: resource
+    busola.io/extension-version: "0.5"
+    control-plane: telemetry-operator
+  name: telemetry-tracepipelines
+  namespace: kyma-system
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/port: "8080"
+    prometheus.io/scrape: "true"
+  labels:
+    app.kubernetes.io/component: telemetry
+    app.kubernetes.io/instance: telemetry-operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: telemetry-operator
+    app.kubernetes.io/part-of: kyma
+    control-plane: telemetry-operator
+  name: telemetry-operator-metrics
+  namespace: kyma-system
+spec:
+  ports:
+  - name: http-metrics
+    port: 8080
+    targetPort: 8080
+  selector:
+    app.kubernetes.io/instance: telemetry
+    app.kubernetes.io/name: operator
+    control-plane: telemetry-operator
+    kyma-project.io/component: controller
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: telemetry
+    app.kubernetes.io/instance: telemetry-operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: telemetry-operator
+    app.kubernetes.io/part-of: kyma
+    control-plane: telemetry-operator
+  name: telemetry-operator-webhook
+  namespace: kyma-system
+spec:
+  ports:
+  - port: 443
+    protocol: TCP
+    targetPort: 9443
+  selector:
+    app.kubernetes.io/instance: telemetry
+    app.kubernetes.io/name: operator
+    control-plane: telemetry-operator
+    kyma-project.io/component: controller
+---
+apiVersion: scheduling.k8s.io/v1
+description: Global (default) scheduling priority of Kyma components. Must not be
+  blocked by unschedulable user workloads.
+globalDefault: false
+kind: PriorityClass
+metadata:
+  labels:
+    app.kubernetes.io/component: telemetry
+    app.kubernetes.io/instance: telemetry-operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: telemetry-operator
+    app.kubernetes.io/part-of: kyma
+    control-plane: telemetry-operator
+  name: telemetry-priority-class
+value: 2000000
+---
+apiVersion: scheduling.k8s.io/v1
+description: Global scheduling priority of Telemetry DaemonSet components. Must not
+  be blocked by unschedulable non-daemonset workloads.
+globalDefault: false
+kind: PriorityClass
+metadata:
+  labels:
+    app.kubernetes.io/component: telemetry
+    app.kubernetes.io/instance: telemetry-operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: telemetry-operator
+    app.kubernetes.io/part-of: kyma
+    control-plane: telemetry-operator
+  name: telemetry-priority-class-high
+value: 2100000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: telemetry
+    app.kubernetes.io/instance: telemetry-operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: telemetry-operator
+    app.kubernetes.io/part-of: kyma
+    control-plane: telemetry-operator
+  name: telemetry-operator
+  namespace: kyma-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: telemetry
+      app.kubernetes.io/name: operator
+      control-plane: telemetry-operator
+      kyma-project.io/component: controller
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: manager
+        sidecar.istio.io/inject: "false"
+      labels:
+        app.kubernetes.io/instance: telemetry
+        app.kubernetes.io/name: operator
+        control-plane: telemetry-operator
+        kyma-project.io/component: controller
+    spec:
+      containers:
+      - args:
+        - --cert-dir=/tmp
+        - --fluent-bit-priority-class-name=telemetry-priority-class-high
+        - --metric-gateway-priority-class=telemetry-priority-class
+        - --trace-collector-priority-class=telemetry-priority-class
+        - --validating-webhook-enabled=true
+        command:
+        - /manager
+        env:
+        - name: APP_LOG_LEVEL
+          value: info
+        - name: MY_POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        image: europe-docker.pkg.dev/kyma-project/prod/telemetry-manager:1.6.0
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8081
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        name: manager
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: 8081
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        resources:
+          limits:
+            cpu: 100m
+            memory: 384Mi
+          requests:
+            cpu: 5m
+            memory: 100Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          privileged: false
+          readOnlyRootFilesystem: false
+      priorityClassName: telemetry-priority-class
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      serviceAccountName: telemetry-operator
+      terminationGracePeriodSeconds: 10
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    app.kubernetes.io/component: telemetry
+    app.kubernetes.io/instance: telemetry-operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: telemetry-operator
+    app.kubernetes.io/part-of: kyma
+    control-plane: telemetry-operator
+  name: telemetry-operator-pprof-deny-ingress
+  namespace: kyma-system
+spec:
+  ingress:
+  - from:
+    - ipBlock:
+        cidr: 0.0.0.0/0
+    ports:
+    - port: 8080
+      protocol: TCP
+    - port: 8081
+      protocol: TCP
+    - port: 9443
+      protocol: TCP
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: telemetry
+      app.kubernetes.io/name: operator
+      control-plane: telemetry-operator
+      kyma-project.io/component: controller
+  policyTypes:
+  - Ingress
